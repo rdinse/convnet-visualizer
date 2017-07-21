@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+     
+  convnet-visualizer.html 
+  Copyright (C) 2017  Robin Dinse <robindinse@googlemail.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+     
+-->
+<html>
+    <head>
+        <title>TensorFlow ConvNet Visualizer</title>
+        <meta charset="utf-8" />
+        <link href="https://fonts.googleapis.com/css?family=Muli:300,400,600" rel="stylesheet">
+        <style>
+         body { margin: 0; padding: 0px; font: 300 11pt/1.2 "Muli"; background: #EEE; color: #333 }
+         main { width: 952px; padding: 6px; margin: auto; }
+         small { font-size: 9pt; color: #999; }
+         h1 { font-weight: 300; font-size: 14pt; padding-top: 2px }
+         input[type=number] { width: 35px }
+         table { border: 0; width: 100%; border: none }
+         th { font-weight: normal; font-size: 9pt; text-align: center; vertical-align: bottom }
+         label { font-size: 9pt; }
+         input[type=checkbox] { margin-right: 3px;}
+         table#main_table tr td:nth-child(1) { font-size: 9pt; text-align: left }
+         table#main_table tr td:nth-child(7) { text-align: center }
+         tr td:nth-child(1) { text-align: right }
+         table#help_table td { font-size: 9pt; user-select: none }
+         b { font-weight: 600 }
+         table#main_table button { width: 18px; height: 18px; padding: 1px 6px 1px 0px; font-color: rgba(0,0,0,0); font-size: 0; border: none; background-color: rgba(0,0,0,0) }
+         table#main_table button.del { background-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%3E%3Ccircle%20cx%3D%229%22%20cy%3D%229%22%20r%3D%228%22%20stroke-width%3D%220.5%22%20fill%3D%22%23FFF%22%20stroke%3D%22%23444%22%20%2F%3E%3Crect%20x%3D%225%22%20y%3D%228%22%20width%3D%228%22%20height%3D%222%22%20fill%3D%22%23777%22%20%2F%3E%3C%2Fsvg%3E); margin-left: 3px; }
+         table#main_table button.add { background-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%3E%3Ccircle%20cx%3D%229%22%20cy%3D%229%22%20r%3D%228%22%20stroke-width%3D%220.5%22%20fill%3D%22%23FFF%22%20stroke%3D%22%23444%22%20%2F%3E%3Crect%20x%3D%225%22%20y%3D%228%22%20width%3D%228%22%20height%3D%222%22%20fill%3D%22%23777%22%20%2F%3E%3Crect%20x%3D%228%22%20y%3D%225%22%20width%3D%222%22%20height%3D%228%22%20fill%3D%22%23777%22%20%2F%3E%3C%2Fsvg%3E) }
+         canvas { position: absolute; background: #CCC; width: 100%; height: 100% }
+         div#sidebar { top: 0; right: 0; position: absolute; padding: 0 20px; width: 420px; height: 100%; z-index: 2; background: #EEE; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAEACAYAAAB71bziAAAEPElEQVRYw7VY2ZIcIQyTXPz/LysP+BAwm9rNMcnDNk1zyJJsoCTh+gU+/P5Fo+BzaTcSzMf9FPYE5p+hfFIOQgBBAJJA7X4SEIByxBydQFTT7ihAwmKORAkgIQgLAsRazP5uqXr10rk/P7HTtXfmOnV2elHqbX7oWNBZC4AFACwk8k2gUapRiYBkk+x/S+TMwsZzI0MWVERUD0EgleEgd49aklQTCQRrTqyKhTRhWbOTBJG5o4F3Ly0co5MhhpGgXOfDOgI3wTfreIIa3Ysz2Ton2S9WIyfmMMKS9i5IvXsfMnDvvfFV0ya5li9R4WDhSYu7mjCujgJAfyVY+edlDrXlFqxDuqFjMTFlyEZ+tLS1SWUbM+7iVlwDS0RzWy7DjlHTzmKk4tLNkIxRkC2KDT99zB7mh9DpUyNPtY4z+AsilJKpVWivM6POkid3iJms281CtCdx7CpEptpG94vaylXiCcKXhH6ZTjs8ZPcUJnAvSrodTN9kndv1ckfMaIxdKJfDkjYw25SEKDNRL4gIYpsVaRMNN4dkUcgw1SwCoaSLDIPoJ37YkaGXRn3RIS43v1HSC4j5+iQUQeXTWGw0eYajMZKRtsVK82RRG6WU9NKxeNZEA5me/E5zsMnVaHsLF2xFIO6cCWr23jXKZ23qU96kE2y8KZroiYjITBMz9SZDZSzqNlUO6oJ9TqjXuiZgzP+WIt1qZ52s3Mld25glAdSYwGNWMiXjWzKcwOlESSOuGZHe04eIye81RAZO5ujtdbTZ8nMefGDZmjj1ooSsWCrTNMjSIS4RFk05GXSJUPrSvX+WN9XbsZphyk2LuxUyvSNodkVUT57G4prk4wzyECsVnFBrl6/Ti2eSKth2hbFuhCzpf6zn/8EZQTORjIhVoC7XUNOGnLzJSlK6clGqY7DkuOJgWekn9kpMYm5BXl2F185G7ztu5Uvia/43eF/jyS8zrFybQ/b2+33qyZKdqprBjxP7PVYZdRX4O2/KlCo/SfEwoaSNFWeUEWxG4XU6a3VcDvYWEvoKus4IlccyI8adDY7cwUwCZHqIF1Bmql1JZP1JguZzIsaoqwGi6YgzY59hoUkqi3rpsHSkw50VJiPYJzYmO4esC3aDTnpPkXc0Q9d5s2NEXZxnHzOnIompSdOCxJSMhp0s91ZX5Hshqw1dVq2dK6TZ2lXo5xHDZNPR/LYMX7P6EKPoSwK5UdvZZk6mB5EzmiCbMmVE4R6vxKADJxt4+SR1f9G+tPMnqyS2I1vlTQrP7UV4IV5ROQUr3CXHn5v/fSqXV9PJ0+jLIQGVLmNYrSkgm0kcp18NnTl9gKNDdgknP1jnRHVgqFsjVhljlWuGmH4XUtDpLZh+TzCnWZywZzTvT9OTJ4kW/bZ7k8eYUwkUVAUyj9sPT3wmm6gpu4npddKMh806dkP1XneSem/MoP97A3n/fgGOUrHY6gBwSQAAAABJRU5ErkJggg=='); background-repeat: repeat-x }
+         a, a:visited { color: #666; }
+         a.highlighted { color: #AAA; }
+         center { font-size: 9pt; }
+         .noselect {-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        </style>
+        <link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARElEQVQ4y2NgoCUwNjb+b2xs/J9szY9vXP3/+MZVvIYwDW4vYGPTxwvYbMTlCia62I5PjonuUYZVHbGpDpu6QeIFSgAACEs7pXa5uMIAAAAASUVORK5CYII=" />
+    </head>
+    <body>
+        <img style="position: absolute; top: 0; left: 0; border: 0; z-index: 3;" id="fork-link" src="https://camo.githubusercontent.com/82b228a3648bf44fc1163ef44c62fcc60081495e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" usemap="#fork-me-map" />
+        <map name="fork-me-map" id="fork-me-map">
+            <area alt="" title="" href="https://www.github.com/rdinse/convnet-visualizer" shape="poly" style="cursor: pointer !important" coords="1,132,133,1,95,1,1,95"/>
+        </map>
+        <div id="sidebar">
+            <h1 class="noselect">TensorFlow ConvNet Visualizer <small>v0.1</small></h1>
+            
+            <table id="main_table" class="noselect">
+                <tr class="noselect">
+                    <th>Name</th><th>Dim.</th><th>Kernel<br />width</th><th>Dilation<br />rate</th><th>Stride</th><th>Padding<br />mode</th><th>Causal/<br />Masked</th><th></th>
+                </tr>
+                <tr>
+                    <td>Input</select></td>
+                    <td colspan="6"><input type="number" id="input_dim" value="32" min="1" max="128" /></td>
+                    <td><button class="add" id="input_add" onclick="add(this)">+</button></td>
+                </tr>
+            </table>
+            <br />
+            <label class="noselect"><input type="checkbox" id="show_indices">Show first and last indices</label>
+            <label class="noselect"><input type="checkbox" id="show_layer_names" checked>Show layer names</label><br />
+            <button onclick="reset()">Reset</button>
+            <button onclick="save_url()">Save as URL</button>
+            <button onclick="save_svg()">Save as SVG</button>
+            <!-- <button <onclick></onclick>()">Save as Keras Code</button> -->
+
+            <div style="position: absolute; font-size: 10pt; height: 190px; bottom: 0; pointer-events: none" class="noselect">
+                <table id="help_table">
+                    <tr><td><b>r</b></td><td>&ensp;re-center view<br /></td></tr>
+                    <tr><td><b>scroll wheel</b></td><td>&ensp;zoom in/zoom out (shift for speed-up)<br /></td></tr>
+                    <tr><td><b>arrow keys, m/n</b></td><td>&ensp;navigate (shift for speed-up)<br /></td></tr>
+                    <tr><td><b>mouse hover</b></td><td>&ensp;display neuron index and highlight receptive field<br /></td></tr>
+                    <tr><td><b>shift-hover</b></td><td>&ensp;display neuron index and highlight projective field<br /></td></tr>
+                    <tr><td><b>left click</b></td><td>&ensp;lock receptive field highlight or clear highlight<br /></td></tr>
+                    <tr><td><b>right click or shift-click</b></td><td>&ensp;lock projective field highlight<br /></td></tr>
+                </table>
+                <!-- 
+                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18"><circle cx="9" cy="9" r="8" stroke-width="0.5" fill="#FFF" stroke="#444" /><rect x="5" y="8" width="8" height="2" fill="#666" /></svg>
+
+                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18"><circle cx="9" cy="9" r="8" stroke-width="0.5" fill="#FFF" stroke="#444" /><rect x="5" y="8" width="8" height="2" fill="#666" /><rect x="8" y="5" width="2" height="8" fill="#666" /></svg>
+                   -->
+                <br />
+                <center style="pointer-events: all !important">&copy; 2017 <a href="https://github.com/rdinse">Robin Dinse</a>. Made with JS, HTML and <a href="http://gliffy.github.io/canvas2svg/">canvas2svg</a>.</center>
+            </div>
+        </div>
+
+        <canvas id="main_canvas"></canvas>
+        
+        <script type="text/javascript" src="https://gitcdn.link/repo/gliffy/canvas2svg/master/canvas2svg.js"></script>
+        <script type="text/javascript" src="convnet-visualizer.js"></script>
+    </body>
+</html>
