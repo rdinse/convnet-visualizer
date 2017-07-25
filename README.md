@@ -3,7 +3,7 @@ ConvNet Visualizer
 
 ![Screenshot](Screenshot.png)
 
-Link to web app: https://rdinse.github.com/convnet-visualizer/convnet-visualizer.html
+Link to web app with WaveNet example: [https://rdinse.github.com/convnet-visualizer/convnet-visualizer.html](http://rdinse.github.io/convnet-visualizer/convnet-visualizer.html#27~0,27,3,8,1,1,1~0,27,3,4,1,1,1~0,27,3,2,1,1,1~0,27,3,1,1,1,1)
 
 This is a web app for visualizing the network structure of convolutional neural networks. By clicking on the neurons one can highlight the receptive and projective fields. The network view can be exported as SVG image.
 
